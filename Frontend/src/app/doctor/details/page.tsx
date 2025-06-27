@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-
+import Image from "next/image";
 
 interface Doctor {
     _id: string;
@@ -78,18 +78,10 @@ interface Doctor {
 interface DoctorProps {
     doctor: Doctor;
 }
+
 const DoctorDetails = () => {
     const router = useRouter();
     const doctor = useSelector((state) => state.doctor.selected);
-
-    const formatDate = (dateString: string) => {
-        const options: Intl.DateTimeFormatOptions = {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    };
 
     if (!doctor) {
         return (
@@ -102,350 +94,208 @@ const DoctorDetails = () => {
     return (
         <>
             <Navbar />
-            <div className="container mx-auto px-4 mb-4">
-                <div className="flex justify-end my-6 ">
-                    <Link href="/appointment">
-                        <button className="btn bg-color-primary text-white w-full rounded-lg py-2 hover:opacity-90">
-                            Book Appointment
-                        </button>
-                    </Link>
-
-                </div>
-
-                <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
-                    <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">
-                        Doctor Details
-                    </h1>
-
-                    {/* Profile Section */}
-                    <div className="bg-white p-6 mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* Image, ID, and Status Section */}
-                            <div>
-                                <div className="flex items-center justify-around">
-                                    {doctor.profile_picture_url ? (
-                                        <img
-                                            src={doctor.profile_picture_url}
-                                            alt="Profile"
-                                            className="w-32 h-32 mb-4"
-                                        />
-                                    ) : (
-                                        <div className="w-32 h-32 mb-4 rounded-full bg-gray-300 flex items-center justify-center">
-                                            <span className="text-gray-600 text-xl">
-                                                {doctor.full_name}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className="">
-                                        <h2 className="text-2xl font-semibold text-gray-700">
-                                            {doctor.full_name}
-                                        </h2>
-                                        <p className="text-gray-600">ID: {doctor.doctor_id}</p>
-                                        <p className=" text-gray-600">Status: {doctor.status}</p>
-                                    </div>
+            <div className="container mx-auto px-4 mb-4 mt-8">
+                {/* Doctor Profile Header */}
+                <div className="flex flex-col md:flex-row gap-8 mb-12">
+                    {/* Doctor Image */}
+                    <div className="w-full md:w-1/3 lg:w-1/4 flex justify-center">
+                        <div className="relative w-64 h-64 rounded-lg overflow-hidden shadow-xl border-4 border-white">
+                            {doctor.profile_picture_url ? (
+                                <Image
+                                    src={doctor.profile_picture_url}
+                                    alt={doctor.full_name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-teal-100 to-cyan-200 flex items-center justify-center">
+                                    <span className="text-2xl font-bold text-gray-700">
+                                        {doctor.full_name.split(' ').map(n => n[0]).join('')}
+                                    </span>
                                 </div>
-                                <p>
-                                    <span className=" text-gray-600 text-justify">Bio:</span> {doctor.bio}
-                                </p>
-                            </div>
-                            {/* Specialization, Experience, and Qualifications Section */}
-                            <div className="bg-white p-6 border-x-4">
-                                <h3 className="mb-4 text-gray-800">Professional Information</h3>
-                                <p>
-                                    <span className=" text-gray-600">Experience:</span>{" "}
-                                    {doctor.experience_years} years
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">Specialization:</span>{" "}
-                                    {doctor.specialization}
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">Qualifications:</span>{" "}
-                                    {doctor.qualifications}
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">License Number:</span>{" "}
-                                    {doctor.license_number}
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">Consultation Fee:</span> $
-                                    {doctor.consultation_fee}
-                                </p>
-                            </div>
-                            {/* Remaining Fields Section */}
-                            <div className="bg-white p-6">
-                                <h3 className=" mb-4 text-gray-800">Personal Information</h3>
-                                <p>
-                                    <span className="text-gray-600">Gender:</span> {doctor.gender}
-                                </p>
-                                {doctor.address && (
-                                    <p>
-                                        <span className=" text-gray-600">Address:</span>{" "}
-                                        {`${doctor.address.street}, ${doctor.address.city}`}
-                                    </p>
-                                )}
-                                <p>
-                                    <span className=" text-gray-600">Phone Number:</span>{" "}
-                                    {doctor.phone_number}
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">Doctor Email:</span>{" "}
-                                    {doctor.email}
-                                </p>
-                                <p>
-                                    <span className=" text-gray-600">Languages Spoken:</span>{" "}
-                                    {doctor.languages_spoken?.join(", ")}
-                                </p>
-                            </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Details Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Left Column */}
-                        {/* Appointments Section */}
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Appointments
-                            </h3>
-                            <ul className="space-y-4">
-                                {doctor.appointments && doctor.appointments.length > 0 ? (
-                                    doctor.appointments.map((appointment) => (
-                                        <li
-                                            key={appointment.appointment_id}
-                                            className="p-4 bg-gray-50 rounded-md shadow-sm"
-                                        >
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Appointment ID:
-                                                </span>{" "}
-                                                {appointment.appointment_id}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Patient ID:
-                                                </span>{" "}
-                                                {appointment.patient_id}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Date:
-                                                </span>{" "}
-                                                {formatDate(appointment.date)}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Status:
-                                                </span>{" "}
-                                                {appointment.status}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Prescription URL:
-                                                </span>{" "}
-                                                <a
-                                                    href={appointment.prescription_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:underline"
-                                                >
-                                                    {appointment.prescription_url}
-                                                </a>
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">
-                                                    Notes:
-                                                </span>{" "}
-                                                {appointment.notes}
-                                            </p>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-600">No appointments available.</p>
-                                )}
-                            </ul>
-                        </div>
-                        {/* Middle Column */}
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Availability
-                            </h3>
-                            <ul className="space-y-4">
-                                {doctor.availability.map((availability, index) => (
-                                    <li
-                                        key={index}
-                                        className="p-4 bg-gray-50 rounded-md shadow-sm"
-                                    >
-                                        <p>
-                                            <span className="font-semibold text-gray-600">Day:</span>{" "}
-                                            {availability.day}
-                                        </p>
-                                        <p>
-                                            <span className="font-semibold text-gray-600">
-                                                Time Slots:
-                                            </span>{" "}
-                                            {availability.time_slots.join(", ")}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        {/* Hospital Affiliations Section */}
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Hospital Affiliations
-                            </h3>
-                            <ul className="space-y-4">
-                                {doctor.hospital_affiliations.map((hospital, index) => (
-                                    <li
-                                        key={index}
-                                        className="p-4 bg-gray-50 rounded-md shadow-sm"
-                                    >
-                                        <p>
-                                            <span className="font-semibold text-gray-600">Name:</span>{" "}
-                                            {hospital.name}
-                                        </p>
-                                        <p>
-                                            <span className="font-semibold text-gray-600">
-                                                Address:
-                                            </span>{" "}
-                                            {`${hospital.address.street}, ${hospital.address.city}, ${hospital.address.state}, ${hospital.address.postal_code}, ${hospital.address.country}`}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        {/* Right Column */}
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Awards and Recognitions
-                            </h3>
-                            <ul className="space-y-4">
-                                {doctor.awards_and_recognitions.map((award, index) => (
-                                    <li
-                                        key={index}
-                                        className="p-4 bg-gray-50 rounded-md shadow-sm"
-                                    >
-                                        <p>{award}</p>
-                                    </li>
-                                ))}
-                            </ul>
+                    {/* Doctor Info */}
+                    <div className="w-full md:w-2/3 lg:w-3/4">
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                            {doctor.full_name.toUpperCase()}
+                        </h1>
+                        <h2 className="text-xl md:text-2xl font-semibold text-teal-600 mb-6">
+                            {doctor.specialization}
+                        </h2>
+
+                        {/* Key Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <div>
+                                <p className="text-gray-600 font-medium">License Number:</p>
+                                <p className="text-gray-800">{doctor.license_number}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-600 font-medium">Experience:</p>
+                                <p className="text-gray-800">{doctor.experience_years} years</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-600 font-medium">Consultation Fee:</p>
+                                <p className="text-gray-800">${doctor.consultation_fee}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-600 font-medium">Languages:</p>
+                                <p className="text-gray-800">{doctor.languages_spoken?.join(", ")}</p>
+                            </div>
                         </div>
 
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Account & Permissions
+                        {/* Book Appointment Button */}
+                        <div className="flex justify-start">
+                            <Link href="/appointment">
+                                <button className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg">
+                                    BOOK APPOINTMENT
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content Sections */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                    {/* Left Column */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* About Section */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                ABOUT
                             </h3>
-                            <p>
-                                <span className="font-semibold text-gray-600">Role:</span>{" "}
-                                {doctor.role}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Verification Status:
-                                </span>{" "}
-                                {doctor.verification_status}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Identity Verified:
-                                </span>{" "}
-                                {doctor.identity_verified ? "Yes" : "No"}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Terms Accepted:
-                                </span>{" "}
-                                {doctor.terms_accepted ? "Yes" : "No"}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Consent Form Signed:
-                                </span>{" "}
-                                {doctor.consent_form_signed ? "Yes" : "No"}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Notifications Enabled:
-                                </span>{" "}
-                                {doctor.notifications_enabled ? "Yes" : "No"}
+                            <p className="text-gray-700 leading-relaxed">
+                                {doctor.bio || "No biography available."}
                             </p>
                         </div>
 
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Documents
+                        {/* Training/Conference Section */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                TRAINING & CONFERENCES
                             </h3>
                             <ul className="space-y-4">
-                                {doctor.documents && doctor.documents.length > 0 ? (
-                                    doctor.documents.map((document, index) => (
-                                        <li
-                                            key={index}
-                                            className="p-4 bg-gray-50 rounded-md shadow-sm"
-                                        >
-                                            <p>
-                                                <span className="font-semibold text-gray-600">Type:</span>{" "}
-                                                {document.type}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold text-gray-600">URL:</span>{" "}
-                                                <a
-                                                    href={document.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:underline break-all"
-                                                >
-                                                    Download Document
-                                                </a>
-                                            </p>
+                                {doctor.awards_and_recognitions?.length > 0 ? (
+                                    doctor.awards_and_recognitions.map((item, index) => (
+                                        <li key={index} className="flex items-start">
+                                            <span className="text-teal-600 mr-2">•</span>
+                                            <span className="text-gray-700">{item}</span>
                                         </li>
                                     ))
                                 ) : (
-                                    <p className="text-gray-600">No documents available.</p>
+                                    <p className="text-gray-500">No training/conferences listed.</p>
                                 )}
                             </ul>
                         </div>
 
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Approval Information
+                        {/* Research & Publications */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                RESEARCH & PUBLICATIONS
                             </h3>
-                            <p>
-                                <span className="font-semibold text-gray-600">Status:</span>{" "}
-                                {doctor.approval.status}
-                            </p>
-                            {doctor.approval.status === "Rejected" && (
-                                <p>
-                                    <span className="font-semibold text-gray-600">Reason:</span>{" "}
-                                    {doctor.approval.reason}
+                            <ul className="space-y-4">
+                                {doctor.documents?.filter(doc => doc.type === "publication").length > 0 ? (
+                                    doctor.documents
+                                        .filter(doc => doc.type === "publication")
+                                        .map((doc, index) => (
+                                            <li key={index} className="flex items-start">
+                                                <span className="text-teal-600 mr-2">•</span>
+                                                <span className="text-gray-700">
+                                                    <a 
+                                                        href={doc.url} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="hover:text-teal-600 hover:underline"
+                                                    >
+                                                        {doc.url.split('/').pop()}
+                                                    </a>
+                                                </span>
+                                            </li>
+                                        ))
+                                ) : (
+                                    <p className="text-gray-500">No publications listed.</p>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-8">
+                        {/* Availability */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                AVAILABILITY
+                            </h3>
+                            <ul className="space-y-3">
+                                {doctor.availability?.length > 0 ? (
+                                    doctor.availability.map((slot, index) => (
+                                        <li key={index} className="flex justify-between">
+                                            <span className="font-medium text-gray-700">{slot.day}:</span>
+                                            <span className="text-gray-600">{slot.time_slots.join(", ")}</span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500">No availability listed.</p>
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* Hospital Affiliations */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                HOSPITAL AFFILIATIONS
+                            </h3>
+                            <ul className="space-y-4">
+                                {doctor.hospital_affiliations?.length > 0 ? (
+                                    doctor.hospital_affiliations.map((hospital, index) => (
+                                        <li key={index} className="flex items-start">
+                                            <span className="text-teal-600 mr-2">•</span>
+                                            <div>
+                                                <p className="font-medium text-gray-700">{hospital.name}</p>
+                                                <p className="text-sm text-gray-600">
+                                                    {hospital.address.street}, {hospital.address.city}
+                                                </p>
+                                            </div>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500">No hospital affiliations listed.</p>
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* Contact Information */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-teal-500">
+                                CONTACT
+                            </h3>
+                            <div className="space-y-3">
+                                <p className="flex items-center">
+                                    <svg className="w-5 h-5 text-teal-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                    <span className="text-gray-700">{doctor.phone_number}</span>
                                 </p>
-                            )}
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Reviewed By:
-                                </span>{" "}
-                                {doctor.approval.reviewed_by}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">
-                                    Reviewed At:
-                                </span>{" "}
-                                {formatDate(doctor.approval.reviewed_at)}
-                            </p>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                                Timestamps
-                            </h3>
-                            <p>
-                                <span className="font-semibold text-gray-600">Created At:</span>{" "}
-                                {formatDate(doctor.created_at)}
-                            </p>
-                            <p>
-                                <span className="font-semibold text-gray-600">Updated At:</span>{" "}
-                                {formatDate(doctor.updated_at)}
-                            </p>
+                                <p className="flex items-center">
+                                    <svg className="w-5 h-5 text-teal-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="text-gray-700">{doctor.email}</span>
+                                </p>
+                                {doctor.address && (
+                                    <p className="flex items-start">
+                                        <svg className="w-5 h-5 text-teal-600 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span className="text-gray-700">
+                                            {doctor.address.street}, {doctor.address.city}, {doctor.address.state}, {doctor.address.country}
+                                        </span>
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
